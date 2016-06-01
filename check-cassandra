@@ -37,6 +37,8 @@ function copy_config() {
 
     cp $CASSANDRA_HOME/conf/cassandra.yaml "${conf_dir}"
     cp $CASSANDRA_HOME/conf/cassandra-env.sh "${conf_dir}"
+    cp $CASSANDRA_HOME/conf/cassandra-rackdc.properties "${conf_dir}"
+    cp $CASSANDRA_HOME/conf/logback.xml "${conf_dir}"
 }
 
 function call_nodetool_cmd() {
@@ -62,7 +64,7 @@ function check_nodetool() {
     call_nodetool_cmd getstreamthroughput
     call_nodetool_cmd gossipinfo
     call_nodetool_cmd netstats
-    call_nodetool_cmd proxyhistogram
+    call_nodetool_cmd proxyhistograms
 }
 
 function check_cqlsh() {
@@ -76,10 +78,10 @@ function check_os() {
     local os_dir="${result_dir}/os"
     mkdir -p "$os_dir"
 
-    whoami > "${os_dir}/whoami"
-    uname -a > "${os_dir}/uname"
-    ulimit -a > "${os_dir}/limits"
-    sysctl -a > "${os_dir}/sysctl"
+    whoami > "${os_dir}/whoami" 2>&1
+    uname -a > "${os_dir}/uname" 2>&1
+    ulimit -a > "${os_dir}/limits" 2>&1
+    sysctl -a > "${os_dir}/sysctl" 2>&1
 }
 
 function copy_logs() {
