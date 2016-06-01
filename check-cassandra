@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Check cassandra local installation.
+#
+# This file is to be executed on all Cassandra nodes while Cassandra is running.
+# It produce a file cassandra-on-<node>-<time>.tar.gz file in current file
+#
+
+# These variables can be changed to adapt the script behavior.
+cassandra_home=
+nodetool=nodetool # Add required global option like jmx authentication
+cqlsh=cqlsh       # Add required global option like CQL authentication
+result_dir="cassandra-on-$(uname -n)-$(date "+%Y%m%d%H%M")"
+
+
+# These variable should not be changed
+result_file="${result_name}.tar.gz"
+
+function prepare_directories() {
+    if [[ -e $result_file ]]; then
+        rm -f "$result_file"
+    fi
+    if [[ -e $result_dir ]]; then
+        rm -fr "$result_dir"
+    fi
+    mkdir -p "$result_dir"
+}
+
+
+# Package
+function package() {
+    cd "$dest_dir"
+    tar czvf "${result_file}" "${result_dir}"
+}
+
+run() {
+    prepare_directories
+    package
+    echo "Cassandra checked result to be found in ${result_file}"
+}
+
+run
