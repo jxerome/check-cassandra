@@ -71,7 +71,7 @@ function check_cqlsh() {
     local cqlsh_dir="${result_dir}/cqlsh"
     mkdir -p "$cqlsh_dir"
 
-    $cqlsh -e "describe full schema" > schema
+    $cqlsh -e "describe full osa" > "$cqlsh_dir/schema"
 }
 
 function check_os() {
