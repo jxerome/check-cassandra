@@ -7,14 +7,11 @@
 #
 
 # These variables can be changed to adapt the script behavior.
-cassandra_home=
+#CASSANDRA_HOME=
 nodetool=nodetool # Add required global option like jmx authentication
 cqlsh=cqlsh       # Add required global option like CQL authentication
 result_dir="cassandra-on-$(uname -n)-$(date "+%Y%m%d%H%M")"
-
-
-# These variable should not be changed
-result_file="${result_name}.tar.gz"
+result_file="${result_dir}.tar.gz"
 
 function prepare_directories() {
     if [[ -e $result_file ]]; then
@@ -26,8 +23,22 @@ function prepare_directories() {
     mkdir -p "$result_dir"
 }
 
+function find_cassandra() {
+    if [[ -z $CASSANDRA_HOME ]]; then
+        echo "Cassandra HOME not found be set CASSANDRA_HOME variable at the begin of the script or in the environnement" >&2
+        exit 1
+    fi
+}
 
-# Package
+function copy_config() {
+    local conf_dir="${result_dir}/conf"
+    mkdir -p "$conf_dir"
+
+    cp $CASSANDRA_HOME/conf/cassandra.yaml "${conf_dir}"
+    cp $CASSANDRA_HOME/conf/cassandra-env.sh "${conf_dir}"
+}
+
+
 function package() {
     cd "$dest_dir"
     tar czvf "${result_file}" "${result_dir}"
@@ -35,6 +46,8 @@ function package() {
 
 run() {
     prepare_directories
+    find_cassandra
+    copy_config
     package
     echo "Cassandra checked result to be found in ${result_file}"
 }
