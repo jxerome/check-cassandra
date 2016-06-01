@@ -44,7 +44,7 @@ function call_nodetool_cmd() {
     $nodetool $cmd > "$nodetool_dir/$cmd"
 }
 
-function nodetool_check() {
+function check_nodetool() {
     local nodetool_dir="${result_dir}/nodetool"
     mkdir -p "$nodetool_dir"
 
@@ -65,6 +65,23 @@ function nodetool_check() {
     call_nodetool_cmd proxyhistogram
 }
 
+function check_cqlsh() {
+    local cqlsh_dir="${result_dir}/cqlsh"
+    mkdir -p "$cqlsh_dir"
+
+    cqlsh -e "describe full schema" > schema
+}
+
+function check_os() {
+    local os_dir="${result_dir}/os"
+    mkdir -p "$os_dir"
+
+    whoami > "${os_dir}/whoami"
+    uname -a > "${os_dir}/uname"
+    ulimit -a > "${os_dir}/limits"
+    sysctl -a > "${os_dir}/sysctl"
+}
+
 function copy_logs() {
     local logs_dir="${result_dir}/logs"
     mkdir -p "$logs_dir"
@@ -81,7 +98,9 @@ run() {
     prepare_directories
     find_cassandra
     copy_config
-    nodetool_check
+    check_nodetool
+    check_cqlsh
+    check_os
     copy_logs
     package
     echo "Cassandra checked result to be found in ${result_file}"
