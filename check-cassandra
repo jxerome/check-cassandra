@@ -10,6 +10,7 @@
 #CASSANDRA_HOME=
 nodetool=nodetool # Add required global option like jmx authentication
 cqlsh=cqlsh       # Add required global option like CQL authentication
+cassandra_logs_dir="${CASSANDRA_HOME}/logs"
 result_dir="cassandra-on-$(uname -n)-$(date "+%Y%m%d%H%M")"
 result_file="${result_dir}.tar.gz"
 
@@ -38,16 +39,50 @@ function copy_config() {
     cp $CASSANDRA_HOME/conf/cassandra-env.sh "${conf_dir}"
 }
 
+function call_nodetool_cmd() {
+    local cmd=$1
+    $nodetool $cmd > "$nodetool_dir/$cmd"
+}
+
+function nodetool_check() {
+    local nodetool_dir="${result_dir}/nodetool"
+    mkdir -p "$nodetool_dir"
+
+    call_nodetool_cmd info
+    call_nodetool_cmd status
+    call_nodetool_cmd version
+    call_nodetool_cmd describecluster
+    call_nodetool_cmd cfstats
+    call_nodetool_cmd tpstats
+    call_nodetool_cmd statusbinary
+    call_nodetool_cmd statusthrift
+    call_nodetool_cmd compactionhistory
+    call_nodetool_cmd compactionstats
+    call_nodetool_cmd getcompactionthroughput
+    call_nodetool_cmd getstreamthroughput
+    call_nodetool_cmd gossipinfo
+    call_nodetool_cmd netstats
+    call_nodetool_cmd proxyhistogram
+}
+
+function copy_logs() {
+    local logs_dir="${result_dir}/logs"
+    mkdir -p "$logs_dir"
+
+    cp "${cassandra_logs_dir}"/* "${logs_dir}"
+}
+
 
 function package() {
-    cd "$dest_dir"
-    tar czvf "${result_file}" "${result_dir}"
+    tar czf "${result_file}" "${result_dir}"
 }
 
 run() {
     prepare_directories
     find_cassandra
     copy_config
+    nodetool_check
+    copy_logs
     package
     echo "Cassandra checked result to be found in ${result_file}"
 }
