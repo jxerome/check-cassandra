@@ -8,8 +8,8 @@
 
 # These variables can be changed to adapt the script behavior.
 #CASSANDRA_HOME=
-nodetool=nodetool # Add required global option like jmx authentication
-cqlsh=cqlsh       # Add required global option like CQL authentication
+nodetool=${CASSANDRA_HOME}/bin/nodetool # Add required global option like jmx authentication
+cqlsh=${CASSANDRA_HOME}/bin/cqlsh       # Add required global option like CQL authentication
 cassandra_logs_dir="${CASSANDRA_HOME}/logs"
 result_dir="cassandra-on-$(uname -n)-$(date "+%Y%m%d%H%M")"
 result_file="${result_dir}.tar.gz"
